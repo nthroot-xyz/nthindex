@@ -1,11 +1,6 @@
-[package]
-name = "missuri"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-crate-type = ["lib"]
-
-[dependencies]
-hex = "0.4.3"
-thiserror = "2"
+[workspace]
+resolver = "2"
+members = [
+    "cli",
+    "core"
+]

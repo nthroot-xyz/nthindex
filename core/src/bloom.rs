@@ -11,7 +11,7 @@ const BLOOM_WIDTH_IN_BITS: usize = 1048576;
 // The number of bytes in a single BloomByte structure
 const BLOOM_WIDTH_IN_BYTES: usize = BLOOM_WIDTH_IN_BITS / 8;
 // The maximum number of addresses to add to a bloomBytes before creating a new one
-const MAX_ADDRS_IN_BLOOM: u16 = 50000;
+const _MAX_ADDRS_IN_BLOOM: u16 = 50000;
 
 #[derive(Debug)]
 pub struct BloomHeader {
@@ -19,14 +19,14 @@ pub struct BloomHeader {
     pub hash: [u8; 32],
 }
 
-struct BloomFilter {
+pub struct BloomFilter {
     count: usize,
     bytes: [u8; BLOOM_WIDTH_IN_BYTES],
 }
 
 pub struct Bloom {
-    bloom_filters: Box<Vec<BloomFilter>>,
-    header: BloomHeader,
+    pub bloom_filters: Box<Vec<BloomFilter>>,
+    pub header: BloomHeader,
 }
 
 impl BloomHeader {

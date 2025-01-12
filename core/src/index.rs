@@ -136,7 +136,7 @@ impl Index {
         let mut block_buf = [0; 4];
         let mut index_buf = [0; 4];
 
-        for _ in (0..record.count) {
+        for _ in 0..record.count {
             self.file.read_exact(&mut block_buf).unwrap();
             self.file.read_exact(&mut index_buf).unwrap();
             results.push(AppearanceRecord {

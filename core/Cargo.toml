@@ -1,0 +1,13 @@
+[package]
+name = "trueblocks"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "trueblocks"
+crate-type = ["lib"]
+
+
+[dependencies]
+hex = "0.4.3"
+thiserror = "2"

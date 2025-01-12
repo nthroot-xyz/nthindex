@@ -1,0 +1,7 @@
+[package]
+name = "orio"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+trueblocks = {path = '../core'}
