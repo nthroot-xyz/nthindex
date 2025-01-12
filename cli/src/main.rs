@@ -1,8 +1,13 @@
+mod index;
+
+use crate::index as orio_index;
+
 use std::fs::File;
 use std::path::PathBuf;
 
+use dirs;
 use trueblocks::address::address_from_string;
-use trueblocks::index;
+
 
 fn main() -> std::io::Result<()> {
     // Open the file 4945
@@ -20,24 +25,27 @@ fn main() -> std::io::Result<()> {
     //     bloom.address_is_member(addr)
     // );
     //println!("{:?}", &bloom.bloom_filters[4].bytes);
-    println!("Checking appearances of 0x{}", raw_addr);
-    let index_path = PathBuf::from("./data/QmePxCpxtCQSDVcGTbQaXNARQjs1Us2WH6tXvixQEqZjCG");
-    let index_file = File::open(index_path.clone()).unwrap();
-    let header = index::HeaderRecord::read_from_file(index_path);
-    println!("{}", header.num_addresses);
-    let mut index = index::Index {
-        file: index_file,
-        header: header,
-        address_table_start: 0,
-        app_table_start: 0,
-    };
+    // println!("Checking appearances of 0x{}", raw_addr);
+    // let index_path = PathBuf::from("./data/QmePxCpxtCQSDVcGTbQaXNARQjs1Us2WH6tXvixQEqZjCG");
+    // let index_file = File::open(index_path.clone()).unwrap();
+    // let header = index::HeaderRecord::read_from_file(index_path);
+    // println!("{}", header.num_addresses);
+    // let mut index = index::Index {
+    //     file: index_file,
+    //     header: header,
+    //     address_table_start: 0,
+    //     app_table_start: 0,
+    // };
 
-    for app in index.read_apparences(&addr) {
-        println!(
-            "{} - {}; 0x{:x} - 0x{:x}",
-            app.block, app.tx_index, app.block, app.tx_index
-        );
-    }
+    // for app in index.read_apparences(&addr) {
+    //     println!(
+    //         "{} - {}; 0x{:x} - 0x{:x}",
+    //         app.block, app.tx_index, app.block, app.tx_index
+    //     );
+    // }
+    //
+    let config_path = dirs::config_dir().unwrap();
+    let index = orio_index::check_index(config_path);
 
     Ok(())
 }

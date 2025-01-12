@@ -5,3 +5,5 @@ edition = "2021"
 
 [dependencies]
 trueblocks = {path = '../core'}
+ureq = "2.12.1"
+dirs = "5.0"
