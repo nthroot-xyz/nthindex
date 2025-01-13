@@ -1,3 +1,5 @@
+pub mod index_file;
+
 use std::io::{self, Read, Seek, SeekFrom};
 use std::{fs::File, path::PathBuf};
 

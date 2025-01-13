@@ -91,7 +91,7 @@ impl Bloom {
     }
 
     pub fn read_from_file(path: PathBuf) -> Result<Bloom, TrueblocksError> {
-        let mut file = File::open(path).map_err(|_| TrueblocksError::BloomFilterError)?;
+        let mut file = File::open(path).map_err(|e| TrueblocksError::BloomFilterError(e.to_string()))?;
         file.rewind().unwrap();
         let header = BloomHeader::read(&mut file);
 
