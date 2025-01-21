@@ -11,3 +11,4 @@ crate-type = ["lib"]
 [dependencies]
 hex = "0.4.3"
 thiserror = "2"
+serde = { version = "1.0", features = ["derive"] }

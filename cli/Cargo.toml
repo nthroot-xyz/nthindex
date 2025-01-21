@@ -5,5 +5,9 @@ edition = "2021"
 
 [dependencies]
 trueblocks = {path = '../core'}
-ureq = "2.12.1"
+surf = {version = "2.3.2", features = ["h1-client-rustls"]}
 dirs = "5.0"
+serde_json = "1.0"
+rayon = "1.8"
+futures = "0.3.0"
+async-std = {version = "1", features = ["attributes"]}
