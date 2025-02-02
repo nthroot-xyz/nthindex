@@ -4,7 +4,10 @@ use crate::index as orio_index;
 
 use std::fs::File;
 use std::path::PathBuf;
-use async_std::prelude::*;
+use std::str::FromStr;
+use futures::stream::iter;
+use rayon::prelude::*;
+use std::sync::Mutex;
 
 use dirs;
 use trueblocks::address::address_from_string;
@@ -12,7 +15,7 @@ use trueblocks::bloom::Bloom;
 //use trueblocks::index::Index;
 
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> std::io::Result<()> {
     // Open the file 4945
     // let path =
@@ -51,16 +54,37 @@ async fn main() -> std::io::Result<()> {
     let config_path = dirs::config_dir().unwrap();
     let index = orio_index::check_index(config_path.clone()).await;
 
-    for chunk in index.chunks[1..index.chunks.len()].into_iter() {
+    let appearences = Mutex::new(Vec::new());
+    index.chunks[1..index.chunks.len()].par_iter().for_each(|chunk| {
         let bloom_path = config_path.join("orio").join("blooms")
             .join(chunk.range.as_str());
         let bloom = match Bloom::read_from_file(bloom_path) {
                 Ok(bloom) => bloom,
-                Err(e) => panic!("Could not oppen bloom due to {:?}", e),
+                Err(e) => {
+                    eprintln!("Could not oppen bloom due to {:?} at {}", e, chunk.range);
+                    return;
+                },
         };
 
         if bloom.address_is_member(addr) {
-            println!("Address {:?} found in {}", raw_addr, chunk.range);
+            appearences.lock().unwrap().push(chunk);
+        }
+    });
+
+    for chunk in appearences.lock().unwrap().iter() {
+        let download = orio_index::download_chunk_index(
+            config_path.join("orio"),
+            chunk,
+        ).await;
+
+        match download {
+            Ok(index_chunk_path) => {
+                let mut index = trueblocks::index::ChunkIndex::new(index_chunk_path);
+                for app in  index.read_apparences(&addr) {
+                    println!("{}", app);
+                }
+            },
+            Err(e) => println!("Error")
         }
     }
     Ok(())
