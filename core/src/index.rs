@@ -1,5 +1,6 @@
 pub mod index_file;
 
+use std::fmt;
 use std::io::{self, Read, Seek, SeekFrom};
 use std::{fs::File, path::PathBuf};
 
@@ -17,7 +18,7 @@ pub struct HeaderRecord {
 }
 
 impl HeaderRecord {
-    pub fn read_from_file(path: PathBuf) -> HeaderRecord {
+    pub fn read_from_file(path: &PathBuf) -> HeaderRecord {
         let mut magic_buffer = [0; 4];
         let mut hash_buffer = [0; 32];
         let mut address_count = [0; 4];
@@ -44,20 +45,42 @@ pub struct AddressRecord {
     pub count: u32,
 }
 
-#[derive(Debug)]
 pub struct AppearanceRecord {
     pub block: u32,
     pub tx_index: u32,
 }
 
-pub struct Index {
+impl fmt::Display for AppearanceRecord {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "AppearanceRecord(block: 0x{:x}, index: 0x{:x})",
+            self.block,
+            self.tx_index
+        )
+    }
+}
+
+pub struct ChunkIndex {
     pub file: File,
     pub header: HeaderRecord,
     pub address_table_start: u64,
     pub app_table_start: u64,
 }
 
-impl Index {
+impl ChunkIndex {
+
+    pub fn new(path: PathBuf) -> ChunkIndex {
+        let header = HeaderRecord::read_from_file(&path);
+        let file = File::open(path).unwrap();
+        ChunkIndex {
+            file,
+            header,
+            address_table_start: 0,
+            app_table_start: 0
+        }
+    }
+
     fn binary_search(&mut self, target_address: &Address) -> io::Result<usize> {
         let address_count = self.header.num_addresses as usize;
 

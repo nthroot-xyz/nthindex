@@ -2,6 +2,7 @@ use crate::errors::TrueblocksError;
 use std::fmt;
 use std::fs::File;
 use std::io::{Read, Seek};
+use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 
 use crate::address::Address;
@@ -93,6 +94,10 @@ impl Bloom {
     pub fn read_from_file(path: PathBuf) -> Result<Bloom, TrueblocksError> {
         let mut file = File::open(path).map_err(|e| TrueblocksError::BloomFilterError(e.to_string()))?;
         file.rewind().unwrap();
+        if file.metadata().unwrap().size() == 0 {
+            return Err(TrueblocksError::BloomFilterError("Empty file".to_string()));
+        }
+
         let header = BloomHeader::read(&mut file);
 
         // read number of blooms
@@ -108,7 +113,9 @@ impl Bloom {
         let mut bloom = [0; BLOOM_WIDTH_IN_BYTES];
         for _ in 0..count as usize {
             file.read_exact(&mut bloom_count).unwrap();
-            file.read_exact(&mut bloom).unwrap();
+            if let Err(e) = file.read_exact(&mut bloom) {
+                return Err(TrueblocksError::BloomFilterError(e.to_string()));
+            }
 
             blooms.push(BloomFilter {
                 count: u32::from_le_bytes(bloom_count) as usize,
